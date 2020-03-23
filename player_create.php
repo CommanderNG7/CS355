@@ -92,16 +92,16 @@ if ( !empty($_POST)) { // if not first time through
 		$pdo = Database::connect();
 		
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "INSERT INTO players (name,password,region,email,image,
-		filename,filesize,filetype) values(?, ?, ?, ?, ?, ?, ?, ?)";
+		$sql = "INSERT INTO players (name,hash,region,email,image,
+		filename,filesize,filetype) values(?, ?, ?, ?, ?, ?, ?,?)";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($name,$passwordhash,$region,$email,$image,
+		$q->execute(array($name,$hash,$region,$email,$image,
 		$fileName,$fileSize,$fileType));
 		
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "SELECT * FROM players WHERE email = ? AND password = ? LIMIT 1";
+		$sql = "SELECT * FROM players WHERE email = ? AND hash = ? LIMIT 1";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($email,$passwordhash));
+		$q->execute(array($email,$hash));
 		$data = $q->fetch(PDO::FETCH_ASSOC);
 		
 		$_SESSION['id'] = $data['id'];
