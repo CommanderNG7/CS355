@@ -7,22 +7,21 @@ require 'database.php';
 if ( !empty($_POST)) { // if $_POST filled then process the form
 
 	// initialize $_POST variables
-	$username = $_POST['username'];
+	$email = $_POST['email'];
 	$password = $_POST['password'];
 	$passwordhash = MD5($password);
 		
 	$pdo = Database::connect();
 	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	$sql = "SELECT * FROM players WHERE email = ? AND password = ? LIMIT 1";
+	$sql = "SELECT * FROM players WHERE email = ? AND hash = ? AND valid = '1' LIMIT 1";
 	$q = $pdo->prepare($sql);
-	$q->execute(array($username,$passwordhash));
+	$q->execute(array($email,$passwordhash));
 	$data = $q->fetch(PDO::FETCH_ASSOC);
-	
 	if($data) { // if successful login set session variables
 		echo "success!";
 		$_SESSION['id'] = $data['id'];
 		$sessionid = $data['id'];
-		$_SESSION['name'] = $data['title'];
+		$_SESSION['name'] = $data['email'];
 		Database::disconnect();
 		header("Location: games.php?id=$sessionid ");
 		// javascript below is necessary for system to work on github
@@ -62,9 +61,9 @@ if ( !empty($_POST)) { // if $_POST filled then process the form
 			<form class="form-horizontal" action="login.php" method="post">
 								  
 				<div class="control-group">
-					<label class="control-label">Username (Email)</label>
+					<label class="control-label">Email</label>
 					<div class="controls">
-						<input name="username" type="text"  placeholder="me@email.com" required> 
+						<input name="email" type="text"  placeholder="me@email.com" required> 
 					</div>	
 				</div> 
 				
