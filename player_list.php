@@ -1,3 +1,11 @@
+<?php
+session_start();
+if(!isset($_SESSION["id"])){ // if "user" not set,
+	session_destroy();
+	header('Location: login.php');     // go to login page
+	exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +21,8 @@
             </div>
             <div class="row">
                 <p>
-                    <a href="create.php" class="btn btn-success">Create</a>
+                    <a href="games.php" class="btn btn-success">Games</a>
+                    <a href="logout.php" class="btn btn-success">Log Out</a>
                 </p>
                  
                 <table class="table table-striped table-bordered">
@@ -35,10 +44,13 @@
                                 echo '<td>'. $row['name'] . '</td>';
                                 echo '<td>'. $row['email'] . '</td>';
                                 echo '<td>'. $row['region'] . '</td>';
-                                echo '<td>'. $row['region'] . '</td>';
+                                echo '<td>'. '<img width=100 src="data:image/jpeg;base64,'
+        . base64_encode( $row['image'] ).'"/>'
+        . '<br><br>';
                                 echo '<td width=250>';
                                 echo '<a class="btn" href="player_read.php?id='.$row['id'].'">Read</a>';
                                 echo ' ';
+                                if($_SESSION['id']==$row['id'])
                                 echo '<a class="btn btn-success" href="player_update.php?id='.$row['id'].'">Update</a>';
                                 echo ' ';
                                 echo '</td>';
