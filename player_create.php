@@ -22,11 +22,19 @@ if ( !empty($_POST)) { // if not first time through
 	$passwordhash = MD5($password);
 	
 	// initialize $_FILES variables
+	if(!empty($_FILES['image']['name'])){
 	$fileName = $_FILES['image']['name'];
 	$tmpName  = $_FILES['image']['tmp_name'];
 	$fileSize = $_FILES['image']['size'];
 	$fileType = $_FILES['image']['type'];
 	$image = file_get_contents($tmpName);
+	}
+	else{
+	    $fileName = 'empty';
+	$image  = null;
+	$fileSize = 0;
+	$fileType = 'empty';
+	}
 
 	// validate user input
 	$valid = true;
@@ -88,20 +96,19 @@ if ( !empty($_POST)) { // if not first time through
 	// insert data
 	if ($valid) 
 	{
-	    	$hash = md5( rand(0,1000) );
 		$pdo = Database::connect();
 		
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		$sql = "INSERT INTO players (name,hash,region,email,image,
 		filename,filesize,filetype) values(?, ?, ?, ?, ?, ?, ?,?)";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($name,$hash,$region,$email,$image,
+		$q->execute(array($name,$passwordhash,$region,$email,$image,
 		$fileName,$fileSize,$fileType));
 		
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		$sql = "SELECT * FROM players WHERE email = ? AND hash = ? LIMIT 1";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($email,$hash));
+		$q->execute(array($email,$passwordhash));
 		$data = $q->fetch(PDO::FETCH_ASSOC);
 		
 		$_SESSION['id'] = $data['id'];
@@ -119,12 +126,13 @@ Password: '.$password.'
 ------------------------
  
 Please click this link to activate your account:
-http://www.ngallati.000webhostapp.com/verify.php?email='.$email.'&hash='.$hash.'
+https://ngallati.000webhostapp.com/As05/verify.php?email='.$email.'&hash='.$passwordhash.'
  
 '; // Our message above including the link
                      
 $headers = 'From:noreply@ngallati.000webhostapp.com' . "\r\n"; // Set from headers
 mail($to, $subject, $message, $headers); // Send our email
+
 		Database::disconnect();
 		header("Location: games.php");	
 }
